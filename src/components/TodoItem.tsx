@@ -20,7 +20,7 @@ function TodoItem({ todo, deleteTodo, toggleComplete, toggleUrgent }: TodoItemPr
             : todo.isUrgent
                 ? "todo-item-urgent"
                 : "todo-item"
-            }
+        }
         >
             <h3>{todo.title}</h3>
             <p>{todo.description}</p>
