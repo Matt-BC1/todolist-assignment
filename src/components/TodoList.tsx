@@ -18,7 +18,7 @@ function TodoList({ todos, deleteTodo, toggleComplete, toggleUrgent }: TodoListP
             {
                 todos.map((todo) => (
                     <TodoItem
-                        // Bug
+                        // Issue #6
                         // Must have a distinct key when iterating
                         key={todo.id}
                         todo={todo}

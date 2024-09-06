@@ -33,7 +33,7 @@ export default function Home() {
             isUrgent: false,
         };
 
-        // BUG
+        // Issue #1
         // We can't minipulate state directly here
         // todos.push(newTodo);
         // setTodos(todos);
@@ -43,9 +43,8 @@ export default function Home() {
     };
 
     const deleteTodo = (id: number) => {
-        // BUG
+        // Issue #2
         // We want to filter for all the ones without the current id
-        // Otherwise we delete all but this 
         // setTodos(todos.filter((todo) => todo.id === id)); 
         setTodos(todos.filter((todo) => todo.id !== id));
     };
@@ -58,14 +57,13 @@ export default function Home() {
             return todo;
         });
         setTodos(orderdTodos(updatedTodos));
-    // }, [setTodos]); Bug using the wrong value in the param
+    // Issue #3
+    // }, [setTodos]); Incorrect dependency
     }, [todos]);
 
 
-    // Not a bug, however, it was just harded to read
-    // So I am just sorting the data instead
-    // This remove complexity from html at the bottom
-    // And we can just update the sort function to work how we want
+    // Not a bug, however, it was just hard to read
+    // Sort them before displaying to clean up the code
     //const displayTodoList = (todoList: Todo[]) => {
     //    return (
     //        <TodoList

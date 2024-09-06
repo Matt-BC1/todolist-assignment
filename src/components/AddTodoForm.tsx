@@ -16,7 +16,8 @@ function AddTodoForm({ addTodo }: AddTodoFormProps) {
         addTodo(title, desc);
         setTitle('');
         setDesc('');
-        // BUG
+
+        // Issue #4
         // Prevent page refresh here
         event.preventDefault();
     };
@@ -26,7 +27,7 @@ function AddTodoForm({ addTodo }: AddTodoFormProps) {
             <div>
                 <label>Title:</label>
                 <input
-                    // BUG
+                    // Issue #5
                     // Missing prop
                     value={title}
                     type="text"
