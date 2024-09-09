@@ -16,6 +16,10 @@ function AddTodoForm({ addTodo }: AddTodoFormProps) {
         addTodo(title, desc);
         setTitle('');
         setDesc('');
+
+        // Issue #4
+        // Prevent page refresh here
+        event.preventDefault();
     };
 
     return (
@@ -23,6 +27,9 @@ function AddTodoForm({ addTodo }: AddTodoFormProps) {
             <div>
                 <label>Title:</label>
                 <input
+                    // Issue #5
+                    // Missing prop
+                    value={title}
                     type="text"
                     placeholder="Provide a title for the new To Do"
                     onChange={(e) => setTitle(e.target.value)}

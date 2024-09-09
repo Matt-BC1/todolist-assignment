@@ -20,77 +20,84 @@ import sampleData from "@/sampleData.json";
  * displayTodos - calls displayTodoList with a filtered To Do selection
  * displayComplete - calls displayTodoList with a filtered To Do selection
  */
-export default function Home() {
-  const [todos, setTodos] = useState<Todo[]>(sampleData);
 
-  const AddTodo = (title: string, desc: string) => {
-    const newTodo: Todo = {
-      id: todos.length + 1,
-      title: title,
-      description: desc,
-      isCompleted: false,
-      isUrgent: false,
+export default function Home() {
+    const [todos, setTodos] = useState<Todo[]>(sampleData);
+
+    const addTodo = (title: string, desc: string) => {
+        const newTodo: Todo = {
+            id: todos.length + 1,
+            title: title,
+            description: desc,
+            isCompleted: false,
+            isUrgent: false,
+        };
+
+        // Issue #1
+        // We can't minipulate state directly here
+        const tempTodo = [...todos, newTodo];     
+        setTodos(orderdTodos(tempTodo));
     };
 
-    todos.push(newTodo);
-    setTodos(todos);
-  };
+    const deleteTodo = (id: number) => {
+        // Issue #2
+        // We want to filter for all the ones without the current id
+        // setTodos(todos.filter((todo) => todo.id === id)); 
+        setTodos(todos.filter((todo) => todo.id !== id));
+    };
 
-  const deleteTodo = (id: number) => {
-    setTodos(todos.filter((todo) => todo.id === id));
-  };
+    const toggleProperty = useCallback((id: number, property: keyof Pick<Todo, 'isCompleted' | 'isUrgent'>) => {
+        const updatedTodos = todos.map((todo) => {
+            if (todo.id === id) {
+                todo[property] = !todo[property] as boolean;
+            }
+            return todo;
+        });
+        setTodos(orderdTodos(updatedTodos));
+    // Issue #3
+    // Incorrect dependency
+    }, [todos]);
 
-  const toggleProperty = useCallback((id: number, property: keyof Pick<Todo, 'isCompleted' | 'isUrgent'>) => {
-    const updatedTodos = todos.map((todo) => {
-      if (todo.id === id) {
-        todo[property] = !todo[property] as boolean;
-      }
-      return todo;
-    });
-    setTodos(updatedTodos);
-  }, [setTodos]);
 
-  const displayTodoList = (todoList:Todo[]) => {
+    // Not a bug, however, it was just hard to read
+    // Sort them before displaying to clean up the code
+    const orderdTodos = (todos: Todo[]): Todo[] => {
+        const urgentItems: Todo[] = [];
+        const items: Todo[] = [];
+        const completeItems: Todo[] = [];
+
+        todos.forEach(todo => {
+            if (todo.isCompleted) {
+                completeItems.push(todo);
+            } else if (todo.isUrgent) {
+                urgentItems.push(todo);
+            } else {
+                items.push(todo);
+            }
+        });
+
+        return [...urgentItems, ...items, ...completeItems];
+    };
+
     return (
-      <TodoList
-        todos={todoList}
-        deleteTodo={deleteTodo} 
-        toggleComplete={(id) => toggleProperty(id, 'isCompleted')} 
-        toggleUrgent={(id) => toggleProperty(id, 'isUrgent')} 
-      />
+        <>
+            <Head>
+                <title>To Do List</title>
+                <meta name="description" content="To Do List App" />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <link rel="icon" href="favicon.ico" />
+            </Head>
+
+            <div className="Home">
+                <Banner />
+                <AddTodoForm addTodo={addTodo} />
+                <TodoList
+                    todos={orderdTodos(todos)}
+                    deleteTodo={deleteTodo}
+                    toggleComplete={(id) => toggleProperty(id, 'isCompleted')}
+                    toggleUrgent={(id) => toggleProperty(id, 'isUrgent')}
+                />
+            </div>
+        </>
     );
-  };
-
-  const displayTodos = (displayUrgent: boolean) => {
-    return displayTodoList(todos.filter((x) => {
-      if (displayUrgent) {
-        return !x.isCompleted && x.isUrgent === displayUrgent;
-      } else {
-        return !x.isCompleted && x.isUrgent !== displayUrgent;
-      }
-    }));
-  };
-
-  const displayComplete = () => {
-    return displayTodoList(todos.filter((x) => x.isCompleted));
-  };
-
-  return (
-    <>
-      <Head>
-        <title>To Do List</title>
-        <meta name="description" content="To Do List App" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="favicon.ico" />
-      </Head>
-
-      <div className="Home">
-        <Banner />
-        <AddTodoForm addTodo={AddTodo}/>
-        {displayTodos(true)}
-        {displayTodos(false)}
-        {displayComplete()}
-      </div>
-    </>
-  );
 }
